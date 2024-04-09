@@ -16,7 +16,34 @@
 %%
 -module(higrow).
 
+-include_lib("kernel/include/logger.hrl").
+
 -export([start/0]).
 
+%% AtomVM main function
+
+%% @doc Main AtomVM entrypoint.
+%%
+%% This function will prepare configuration, logging and wireless
+%% networking facilities before starting the application, and after
+%% that will loop forever taking the device readings and dispatching
+%% them to the gateway.
 start() ->
-    ok.
+    Config = higrow_config:read_config(),
+    WiFiConfig = proplists:get_value(higrow_wifi, Config),
+
+    {ok, _} = logger_manager:start_link(#{}),
+    {ok, {IP, _, _}} = higrow_wifi:start(WiFiConfig),
+    {ok, _} = higrow_app:start(normal, []),
+
+    higrow_status:set_ip(IP),
+    ?LOG_NOTICE("entering loop..."),
+    loop(#{sleep_ms => 50}).
+
+%% Internal functions
+
+%% @hidden
+loop(State) ->
+    #{sleep_ms := SleepMs} = State,
+    _ = timer:sleep(SleepMs),
+    loop(State).

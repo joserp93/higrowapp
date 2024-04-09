@@ -1,0 +1,5 @@
+-ifdef(PROD).
+-include("config.prod.hrl").
+-else.
+-include("config.dev.hrl").
+-endif.

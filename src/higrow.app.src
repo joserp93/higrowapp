@@ -19,6 +19,7 @@
     {description, "Higrow An AtomVM application"},
     {vsn, "0.1.0"},
     {registered, []},
+    {mod, {higrow_app, []}},
     {applications, [
         kernel, stdlib, atomvm_lib
     ]},

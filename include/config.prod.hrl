@@ -1,0 +1,7 @@
+-define(DEFAULT_STA_SSID, <<"ssid">>).
+-define(DEFAULT_STA_PSK, <<"12345678">>).
+-define(DEFAULT_NTP_HOST, "pool.ntp.org").
+-define(DEFAULT_MQTT_URL, "").
+-define(DEFAULT_MQTT_USER, "").
+-define(DEFAULT_MQTT_PSK, "").
+-define(DEFAULT_MQTT_CLIENT, "").
