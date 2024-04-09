@@ -64,5 +64,6 @@ default_config() ->
      {higrow_mqtt, [{url, ?DEFAULT_MQTT_URL},
                     {user, ?DEFAULT_MQTT_USER},
                     {psk, ?DEFAULT_MQTT_PSK},
-                    {client, ?DEFAULT_MQTT_CLIENT}]}
+                    {client, ?DEFAULT_MQTT_CLIENT},
+                    {topic, ?DEFAULT_MQTT_TOPIC}]}
     ].
