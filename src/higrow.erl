@@ -38,7 +38,6 @@ start() ->
     {ok, _} = higrow_mqtt:start(MqttConfig),
     {ok, _} = higrow_app:start(normal, []),
 
-    higrow_status:set_ip(IP),
     ?LOG_NOTICE("entering loop..."),
     loop(#{sleep_ms => 50}).
 
