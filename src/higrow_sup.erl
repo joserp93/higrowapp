@@ -30,7 +30,6 @@ init([]) ->
 
     ChildSpecs =
         [
-         worker(higrow_mqtt, Config, [])
         ],
 
     SupFlags = {one_for_one, ?INTENSITY, ?PERIOD},

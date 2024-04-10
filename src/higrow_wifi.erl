@@ -35,6 +35,7 @@ start(Config) ->
     SSID = proplists:get_value(ssid, Config),
     Psk = proplists:get_value(psk, Config),
     NTPHost = proplists:get_value(ntp, Config),
+
     NetConfig =
         [{sntp, [{host, NTPHost},
                  {synchronized, fun ntp_syncronized/1}]},
