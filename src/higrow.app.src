@@ -21,7 +21,7 @@
     {registered, []},
     {mod, {higrow_app, []}},
     {applications, [
-        kernel, stdlib, atomvm_lib, mqtt_client
+        kernel, stdlib, atomvm_lib, atomvm_mqtt_client
     ]},
     {env,[]},
     {modules, []},
