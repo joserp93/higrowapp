@@ -47,6 +47,8 @@ init(Config) ->
 
     FormattedUrl = io_lib:format("mqtt://~s:~s@~s", [User, Psk, Url]),
 
+    ?LOG_NOTICE("MQTT init ~s", [FormattedUrl]),
+
     MQTTConfig = #{
         url => FormattedUrl,
         connected_handler => fun handle_connected/1,
@@ -65,13 +67,27 @@ init(Config) ->
     {ok, State}.
 
 %% @private
-handle_info(pub_data, #{mqtt := Mqtt, topic := Topic} = State) ->
-    PublishOptions = #{
-    qos => exactly_once,
-    published_handler => fun handle_publish/3
-    },
-    Message = <<"{temperature: 25}">>,
-    ok = mqtt_client:publish(Mqtt, Topic, Message, PublishOptions),
+handle_info(pub_data, #{mqtt := MQTT, topic := Topic} = State) ->
+    ?LOG_NOTICE("Publishing data on topic ~p", [Topic]),
+    try
+        Self = self(),
+        HandlePublished = fun(MQTT2, Topic2, MsgId) ->
+            Self ! published,
+            handle_published(MQTT2, Topic2, MsgId)
+        end,
+        PublishOptions = #{qos => at_least_once, published_handler => HandlePublished},
+        Msg = <<"{temperature: 25}">>,
+        _ = mqtt_client:publish(MQTT, Topic, Msg, PublishOptions),
+        receive
+            published ->
+                ok
+        after 10000 ->
+            io:format("Timed out waiting for publish ack~n")
+        end
+    catch
+        C:E:S ->
+            io:format("Error in publish: ~p:~p~p~n", [C, E, S])
+    end,
     _Timer = timer_manager:send_after(10000, self(), pub_data),
     {noreply, State};
 handle_info(_Msg, State) ->
@@ -82,13 +98,17 @@ handle_call(_Msg, _From, State) ->
     {reply, ok, State}.
 
 %% @private
+handle_cast({send_pub_data, MQTT}, State) ->
+    ?LOG_NOTICE("Init send pub", []),
+     _Timer = timer_manager:send_after(10000, self(), pub_data),
+    {noreply, State#{mqtt => MQTT}};
 handle_cast(_Msg, State) ->
     {noreply, State}.
 
 handle_connected(MQTT) ->
     Config = mqtt_client:get_config(MQTT),
     ?LOG_NOTICE("Connected to ~p", [maps:get(url, Config)]),
-    _Timer = timer_manager:send_after(10000, self(), pub_data).
+    gen_server:cast(?SERVER, {send_pub_data, MQTT}).
     
 handle_disconnected(_MQTT) ->
     ?LOG_NOTICE("Disconnected from broker", []).
@@ -96,8 +116,8 @@ handle_disconnected(_MQTT) ->
 handle_error(_MQTT, Error) ->
     ?LOG_NOTICE("Disconnected from broker ~p", [Error]).
 
-handle_publish(_MQTT, Topic, MsgId) ->
-    ?LOG_NOTICE("Message ~p was published to topic ~p", [MsgId, Topic]).
+handle_published(MQTT, Topic, MsgId) ->
+    ?LOG_NOTICE("MQTT ~p published to topic ~p msg_id=~p", [MQTT, Topic, MsgId]).
 
 
 

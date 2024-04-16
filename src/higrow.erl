@@ -31,11 +31,9 @@
 start() ->
     Config = higrow_config:read_config(),
     WiFiConfig = proplists:get_value(higrow_wifi, Config),
-    MqttConfig = proplists:get_value(higrow_mqtt, Config),
 
     {ok, _} = logger_manager:start_link(#{}),
     {ok, {_IP, _, _}} = higrow_wifi:start(WiFiConfig),
-    {ok, _} = higrow_mqtt:start(MqttConfig),
     {ok, _} = higrow_app:start(normal, []),
 
     ?LOG_NOTICE("entering loop..."),
