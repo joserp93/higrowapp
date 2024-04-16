@@ -4,5 +4,4 @@
 -define(DEFAULT_MQTT_URL, "mqtt.thingsboard.cloud").
 -define(DEFAULT_MQTT_USER, "user").
 -define(DEFAULT_MQTT_PSK, "psk").
--define(DEFAULT_MQTT_CLIENT, "higrow1").
 -define(DEFAULT_MQTT_TOPIC, "esp/telemetry").
