@@ -45,9 +45,7 @@ init(Config) ->
     Psk = proplists:get_value(psk, Config),
     Topic = proplists:get_value(topic, Config),
 
-    FormattedUrl = io_lib:format("mqtt://~s:~s@~s", [User, Psk, Url]),
-
-    ?LOG_NOTICE("MQTT init ~s", [FormattedUrl]),
+    FormattedUrl = list_to_binary("mqtt://" ++ User ++ ":" ++ Psk ++ "@" ++ Url),
 
     MQTTConfig = #{
         url => FormattedUrl,
